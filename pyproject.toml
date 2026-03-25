@@ -1,0 +1,17 @@
+[project]
+name = "nodelect"
+version = "0.1.0"
+description = "A Node.js version manager"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "nuitka>=4.0.5",
+    "zstandard>=0.25.0",
+]
+
+[project.scripts]
+nodelect = "nodelect.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
