@@ -18,11 +18,37 @@ if (Test-Path $tempDir) {
 New-Item -ItemType Directory -Force -Path "$tempDir"        | Out-Null
 New-Item -ItemType Directory -Force -Path "$tempDir\shims"  | Out-Null
 
+function Copy-PreferredShim {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Root,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [string]$Destination
+    )
+
+    $exePath = "$Root\dist\shims\$Name.exe"
+    $cmdPath = "$Root\dist\shims\$Name.cmd"
+
+    if (Test-Path $exePath) {
+        Copy-Item $exePath $Destination
+        return
+    }
+
+    if (Test-Path $cmdPath) {
+        Copy-Item $cmdPath $Destination
+        return
+    }
+
+    throw "No se encontró shim para '$Name' (.exe o .cmd) en dist\shims"
+}
+
 # Copiar archivos
 Copy-Item "$root\dist\nodelect.exe"       "$tempDir\"
-Copy-Item "$root\dist\shims\node.exe"     "$tempDir\shims\"
-Copy-Item "$root\dist\shims\npm.exe"      "$tempDir\shims\"
-Copy-Item "$root\dist\shims\npx.exe"      "$tempDir\shims\"
+Copy-PreferredShim -Root $root -Name "node" -Destination "$tempDir\shims\"
+Copy-PreferredShim -Root $root -Name "npm"  -Destination "$tempDir\shims\"
+Copy-PreferredShim -Root $root -Name "npx"  -Destination "$tempDir\shims\"
 Copy-Item "$root\assets\icon.ico"         "$tempDir\"
 
 # Generar ZIP (sobreescribe si ya existe)
